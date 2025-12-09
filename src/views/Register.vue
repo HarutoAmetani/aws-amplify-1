@@ -1,28 +1,40 @@
 <template>
-  <h1>新規登録</h1>
-  <div>
-    <label for="email">メールアドレス</label>
-    <input
-      id="email"
-      type="text"
-      v-model="email"
-    >
-  </div>
-  <div>
-    <label for="password">パスワード</label>
-    <input
-      id="password"
-      type="password"
-      v-model="password"
-    >
-  </div>
-  <div>
-    <button @click="register">
-      新規登録
-    </button>
-  </div>
+  <v-container max-width="400">
+    <v-card>
+      <v-card-item>
+        <v-card-title>
+          新規登録
+        </v-card-title>
 
-  <p v-if="message">{{ message }}</p>
+        <v-text-field
+          label="メールアドレス"
+          type="email"
+          v-model="email"
+        />
+        <v-text-field
+          label="パスワード"
+          type="password"
+          v-model="password"
+        />
+
+        <v-alert
+          v-if="message"
+          type="error"
+          class="mb-5"
+        >
+          {{ message }}
+        </v-alert>
+
+        <v-btn
+          block
+          color="primary"
+          @click="register"
+        >
+          新規登録
+        </v-btn>
+      </v-card-item>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup>
