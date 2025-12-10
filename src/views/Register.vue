@@ -56,8 +56,6 @@ const client = new CognitoIdentityProviderClient({
 const router = useRouter();
 
 async function register() {
-  message.value = "処理中..."
-
   try {
     const command = new SignUpCommand({
       ClientId: CLIENT_ID,
@@ -69,7 +67,6 @@ async function register() {
     })
 
     const result = await client.send(command)
-    message.value = "登録成功！メールを確認してください。"
     router.push('/vertify')
   } catch (err) {
     console.error(err)

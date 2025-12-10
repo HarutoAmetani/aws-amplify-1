@@ -1,27 +1,56 @@
 <template>
-  <h1>確認コード入力</h1>
+  <v-container max-width="400">
+    <v-card>
+      <v-card-item>
+        <v-card-title>
+          確認コード入力
+        </v-card-title>
 
-  <div>
-    <label for="email">メールアドレス</label>
-    <input id="email" type="text" v-model="email">
-  </div>
+        <v-text-field
+          label="メールアドレス"
+          type="email"
+          v-model="email"
+        />
 
-  <div>
-    <label for="code">確認コード</label>
-    <input id="code" type="text" v-model="code">
-  </div>
+        <v-text-field
+          label="確認コード"
+          v-model="code"
+        />
 
-  <div>
-    <button @click="confirm">確認</button>
-    <button @click="resendCode">コードを再送</button>
-  </div>
+        <v-alert
+          v-if="message"
+          type="error"
+          class="mb-5"
+        >
+          {{ message }}
+        </v-alert>
 
-  <p v-if="message">{{ message }}</p>
+        <v-btn
+          block
+          color="primary"
+          class="mb-3"
+          @click="confirm"
+        >
+          確認
+        </v-btn>
+
+        <v-btn
+          block
+          color="secondary"
+          @click="resendCode"
+        >
+          コードを再送
+        </v-btn>
+
+      </v-card-item>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { CognitoIdentityProviderClient, ConfirmSignUpCommand, ResendConfirmationCodeCommand } from "@aws-sdk/client-cognito-identity-provider"
+import { useRouter } from 'vuetify/lib/composables/router.mjs';
 
 const email = ref('')
 const code = ref('')
@@ -34,9 +63,9 @@ const client = new CognitoIdentityProviderClient({
   region: AWS_REGION
 })
 
-async function confirm() {
-  message.value = "処理中..."
+const router = useRouter()
 
+async function confirm() {
   try {
     const command = new ConfirmSignUpCommand({
       ClientId: CLIENT_ID,
@@ -45,7 +74,7 @@ async function confirm() {
     })
 
     await client.send(command)
-    message.value = "確認が完了しました！ログイン可能です。"
+    router.push('/')
   } catch (err) {
     console.error(err)
     message.value = "エラー: " + err.message
@@ -53,8 +82,6 @@ async function confirm() {
 }
 
 async function resendCode() {
-  message.value = "処理中..."
-
   try {
     const command = new ResendConfirmationCodeCommand({
       ClientId: CLIENT_ID,
@@ -62,7 +89,6 @@ async function resendCode() {
     })
 
     await client.send(command)
-    message.value = "確認コードを再送しました！メールをチェックしてください。"
   } catch (err) {
     console.error(err)
     message.value = "エラー: " + err.message

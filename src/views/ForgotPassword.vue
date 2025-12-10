@@ -1,16 +1,35 @@
 <template>
-  <h1>パスワードリセット</h1>
+  <v-container max-width="400">
+    <v-card>
+      <v-card-item>
+        <v-card-title>
+          パスワードリセット
+        </v-card-title>
 
-  <div>
-    <label for="email">メールアドレス</label>
-    <input id="email" type="text" v-model="email" />
-  </div>
+        <v-text-field
+          label="メールアドレス"
+          type="email"
+          v-model="email"
+        />
 
-  <div>
-    <button @click="sendResetCode">リセットメール送信</button>
-  </div>
+        <v-alert
+          v-if="message"
+          type="error"
+          class="mb-5"
+        >
+          {{ message }}
+        </v-alert>
 
-  <p v-if="message">{{ message }}</p>
+        <v-btn
+          block
+          color="primary"
+          @click="sendResetCode"
+        >
+          リセットメール送信
+        </v-btn>
+      </v-card-item>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup>
@@ -31,8 +50,6 @@ const client = new CognitoIdentityProviderClient({
 const router = useRouter()
 
 async function sendResetCode() {
-  message.value = "送信中..."
-
   try {
     const command = new ForgotPasswordCommand({
       ClientId: CLIENT_ID,
@@ -40,9 +57,7 @@ async function sendResetCode() {
     })
 
     const result = await client.send(command)
-    message.value = "パスワードリセットコードを送信しました。メールをご確認ください。"
     router.push('/confirm-forgot-password')
-
   } catch (err) {
     console.error(err)
     message.value = "エラー: " + err.message

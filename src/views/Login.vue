@@ -1,21 +1,41 @@
 <template>
-  <h1>ログイン</h1>
+  <v-container max-width="400">
+    <v-card>
+      <v-card-item>
+        <v-card-title>
+          ログイン
+        </v-card-title>
 
-  <div>
-    <label for="email">メールアドレス</label>
-    <input id="email" type="text" v-model="email">
-  </div>
+        <v-text-field
+          label="メールアドレス"
+          type="email"
+          v-model="email"
+        />
 
-  <div>
-    <label for="password">パスワード</label>
-    <input id="password" type="password" v-model="password">
-  </div>
+        <v-text-field
+          label="パスワード"
+          type="password"
+          v-model="password"
+        />
 
-  <div>
-    <button @click="login">ログイン</button>
-  </div>
+        <v-alert
+          v-if="message"
+          type="error"
+          class="mb-5"
+        >
+          {{ message }}
+        </v-alert>
 
-  <p v-if="message">{{ message }}</p>
+        <v-btn
+          block
+          color="primary"
+          @click="login"
+        >
+          ログイン
+        </v-btn>
+      </v-card-item>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup>
@@ -24,6 +44,7 @@ import {
   CognitoIdentityProviderClient, 
   InitiateAuthCommand 
 } from "@aws-sdk/client-cognito-identity-provider"
+import { useRouter } from 'vuetify/lib/composables/router.mjs'
 
 const email = ref('')
 const password = ref('')
@@ -36,9 +57,9 @@ const client = new CognitoIdentityProviderClient({
   region: AWS_REGION
 })
 
-async function login() {
-  message.value = "処理中..."
+const router = useRouter()
 
+async function login() {
   try {
     const command = new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
@@ -50,8 +71,8 @@ async function login() {
     })
 
     const result = await client.send(command)
-    message.value = "ログイン成功！"
-    console.log(result)
+    localStorage.setItem("idToken", result.AuthenticationResult.IdToken)
+    router.push('/')
   } catch (err) {
     console.error(err)
     message.value = "エラー: " + err.message
