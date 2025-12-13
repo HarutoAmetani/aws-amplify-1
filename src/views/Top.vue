@@ -8,6 +8,7 @@
       </v-list>
       <v-list nav v-else>
         <v-list-item title="ログアウト" link @click="logout"></v-list-item>
+        <v-list-item title="退会" link @click="withdrawal"></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -26,6 +27,10 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue'
+import { 
+  CognitoIdentityProviderClient, 
+  DeleteUserCommand 
+} from "@aws-sdk/client-cognito-identity-provider"
 
 const drawer = ref(false)
 
@@ -76,7 +81,33 @@ function toForgotPassword() {
 }
 
 function logout() {
-  localStorage.setItem("idToken", null)
+  localStorage.removeItem("accessToken")
+  localStorage.removeItem("idToken")
   location.reload()
+}
+
+const CLIENT_ID = "44qpua3f2bhop297j64gcjsbv6"
+const AWS_REGION = "ap-northeast-1"
+
+const client = new CognitoIdentityProviderClient({
+  region: AWS_REGION
+})
+
+async function withdrawal() {
+  const AccessToken = localStorage.getItem("accessToken")
+  try {
+    const command = new DeleteUserCommand({
+      AccessToken: AccessToken
+    })
+
+    await client.send(command)
+
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("idToken")
+
+    location.reload()
+  } catch (err) {
+    console.log(err)
+  }
 }
 </script>

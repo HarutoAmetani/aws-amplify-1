@@ -71,6 +71,7 @@ async function login() {
     })
 
     const result = await client.send(command)
+    localStorage.setItem("accessToken", result.AuthenticationResult.AccessToken)
     localStorage.setItem("idToken", result.AuthenticationResult.IdToken)
     router.push('/')
   } catch (err) {
